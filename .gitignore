@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+.venv/
+venv/
+
+# Local credentials and Forge runtime state must never enter Git.
+.env
+.env.*
+!.env.example
+.forge/
+
+# Local demo artefacts.
+demo.mp4
+*.zip
+.pdf-page-*.png
+/推免考核题目学生版.pdf
