@@ -1,6 +1,6 @@
 Forge 编程智能体
 
-公开 Git 仓库：[发布后在此填写 GitHub/Gitee 地址]
+公开 Git 仓库：https://github.com/liangshaotian/nju-forge-agent
 
 Forge 是一个从零实现的命令行 coding agent。它直连 OpenAI-compatible Chat Completions API，不使用 LangChain、Agents SDK 等 agent 框架，也不依赖服务端代码执行或文件工具。运行时仅需 Python 3.8+，无第三方依赖。
 
@@ -14,4 +14,3 @@ Forge 是一个从零实现的命令行 coding agent。它直连 OpenAI-compatib
 5. 长程上下文：按完整 assistant-tool 事务压缩旧历史，保留需求、决策和关键结果，不破坏工具调用协议。
 
 常用选项：--approval ask/auto/read-only，--max-steps，--context-tokens，--show-reasoning。输入 /help 查看交互命令。详细架构、风险边界与答辩说明见 docs/DESIGN.md；配置方法见 docs/SETUP.md；演示流程见 docs/DEMO.md。
-
