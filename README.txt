@@ -1,6 +1,6 @@
 Forge 编程智能体
 
-公开 Git 仓库：https://github.com/liangshaotian/nju-forge-agent
+公开 Git 仓库：https://github.com/forge-agent-a9c27/nju-forge-agent
 
 一、项目简介
 Forge 是一个从零设计并实现的命令行 coding agent。用户只需描述编程目标，Forge 就会与大语言模型交互，自主查看代码、制定计划、修改文件、执行测试，并根据真实结果继续决策，直到完成任务或触发明确的终止条件。项目不使用 LangChain、LlamaIndex、OpenAI Agents SDK 等 agent 框架，也不依赖 Code Interpreter、Files API 等服务端托管工具；模型协议、对话历史、上下文压缩、工具调用解析、本地执行、错误恢复和循环控制均自行实现。
