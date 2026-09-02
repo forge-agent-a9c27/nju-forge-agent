@@ -26,7 +26,7 @@ Context Manager <──── Tool Runtime
 1. 用户消息写入 `Conversation`。
 2. 超过预算时，按完整的 assistant + tool results 事务分组压缩，避免产生“有 tool call、无 tool result”的非法历史。
 3. `OpenAICompatibleClient` 把消息与工具 Schema 直接 POST 给模型厂商。429、超时和 5xx 使用有上限的指数退避。
-4. 解析原生 `tool_calls`；少数兼容网关若把调用降级成文本，也只接受显式 `<tool_call>` JSON 标签，避免误判普通代码块。
+4. 解析原生 `tool_calls` 和旧式 `function_call`。若兼容网关接受 tools 却吞掉调用结果，客户端根据“正文与调用均为空”的响应自动探测故障，撤掉 native tools 后重试。此后把工具 Schema、历史调用和 observation 映射到显式 `<tool_call>` / `<tool_result>` 文本协议，既避免每轮双重请求，也不依赖网关修复；标签外的普通代码块不会被误判。
 5. `ToolRuntime` 做 JSON 解码、字段白名单和类型校验，再执行本地实现。任何异常都会变成 `[ERROR]` observation 返回模型，而不会击穿循环。
 6. 模型收到真实结果后继续决策。连续三次完全相同的调用批次会被熔断；达到步数上限后撤掉全部工具，只允许一次事实性总结。
 7. 模型不再调用工具时，其文本即最终答复。
@@ -62,6 +62,8 @@ Forge 不依赖某一家 tokenizer，而用偏保守的中英文字符估算。�
 | 文件冲突/越界/敏感路径 | 拒绝且说明边界 |
 | 命令失败/超时/输出过长 | 返回退出码、部分输出或头尾摘要 |
 | API 临时错误 | 退避重试，超限后终止当前任务 |
+| 网关吞掉原生 tool call | 自动切换文本工具协议并保持后续轮次 |
+| 空响应 | 报告 finish reason、usage 和推理长度，不再伪装完成 |
 | 重复工具批次 | 第三次返回 loop guard |
 | 达到最大步数 | 工具置空，生成一次最终交接 |
 | Ctrl+C | 补齐悬空 tool result，保持下轮协议有效 |
@@ -69,4 +71,3 @@ Forge 不依赖某一家 tokenizer，而用偏保守的中英文字符估算。�
 ## 已知边界与可演进方向
 
 当前版本没有 OS 级容器隔离、流式输出、语义向量检索和多 agent 并行。后续优先级是：以容器执行未知命令；对只读工具做并发调度；增加 Responses/Anthropic 原生适配器；用增量索引替代大仓库逐文件搜索；为编辑 journal 增加会话级 checkpoint。它们都可以在现有边界后扩展，不需要重写 agent 循环。
-

@@ -32,6 +32,7 @@ class ModelResponse:
     finish_reason: Optional[str] = None
     usage: Dict[str, int] = field(default_factory=dict)
     reasoning: str = ""
+    transport: str = "native"
 
     def assistant_message(self) -> Dict[str, Any]:
         message: Dict[str, Any] = {
@@ -52,4 +53,3 @@ class ToolResult:
     def for_model(self) -> str:
         prefix = "OK" if self.ok else "ERROR"
         return f"[{prefix}] {self.output}"
-

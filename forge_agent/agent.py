@@ -79,6 +79,7 @@ class CodingAgent:
         self.total_runs = 0
         self.total_tool_calls = 0
         self.last_result: Optional[RunResult] = None
+        self._reported_text_fallback = False
 
     def clear(self) -> None:
         self.conversation.clear()
@@ -126,6 +127,11 @@ class CodingAgent:
             completion_tokens += response.usage.get("completion_tokens", 0)
             if self.show_reasoning and response.reasoning.strip():
                 self.console.status("reasoning: " + self._clip(response.reasoning, 500))
+            if response.transport == "text-fallback" and not self._reported_text_fallback:
+                self.console.warning(
+                    "gateway dropped native tool calls; switched to Forge text-tool compatibility mode"
+                )
+                self._reported_text_fallback = True
             self.conversation.add(response.assistant_message())
 
             if not response.tool_calls:
